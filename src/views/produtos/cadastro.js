@@ -7,7 +7,8 @@ const estadoInicial = {
     descricao: '',
     preco: 0,
     fornecedor: '',
-    sucesso: false
+    sucesso: false,
+    errors: []
 }
 
 export default class CadastroProduto extends React.Component{
@@ -27,18 +28,23 @@ export default class CadastroProduto extends React.Component{
     }
 
     onSubmit = (event) => {
+
         const produto = {
-            nome: this.state.name,
+            nome: this.state.nome,
             sku: this.state.sku,
             descricao: this.state.descricao,
             preco: this.state.preco,
             fornecedor: this.state.fornecedor
         }
 
-        this.service.salvar(produto);
-
-        this.limpaCampos();
-        this.setState({ sucesso: true });
+        try{
+            this.service.salvar(produto);
+            this.limpaCampos();
+            this.setState({ sucesso: true });
+        }catch(erro){
+            const errors = erro.errors;
+            this.setState({errors : errors});
+        }
         
     }
 
@@ -59,6 +65,18 @@ export default class CadastroProduto extends React.Component{
                             <button type="button" className="close" data-dismiss="alert">&times;</button>
                             <strong>Sucesso</strong> Cadastro Realizado com Sucesso.
                         </div>
+                    }
+
+                    { this.state.errors.length > 0 &&
+                        this.state.errors.map( msg => {
+                            return(
+                            <div className="alert alert-dismissible alert-danger">
+                                <button type="button" className="close" data-dismiss="alert">&times;</button>
+                                <strong>Erro</strong> {msg}
+                            </div>
+                            );
+                        })
+                        
                     }
 
                     <div className="row">
